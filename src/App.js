@@ -1,17 +1,21 @@
+import React from 'react';
+import Header from './components/Header';
+import SignUpForm from './components/SignUpForm';
 
-import React from "react";
-import Header from "./components/Header";
-import ToDoForm from "./components/ToDoForm";
-import ToDoList from "./components/ToDoList";
+function App() {
+    const appStyle = {
+        maxWidth: '600px',
+        margin: '0 auto',
+        padding: '20px',
+        boxSizing: 'border-box',
+    };
 
-function App(){
-  return(
-    <div>
-      <Header />
-      <ToDoForm />
-      <ToDoList />
-    </div>
-  );
+    return (
+        <div style={appStyle}>
+            <Header />
+            <SignUpForm />
+        </div>
+    );
 }
 
 export default App;
