@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {useNavigate} from 'react-router-dom';
 
 function SignUpForm() {
     const [formData, setFormData] = useState({
@@ -29,6 +30,7 @@ function SignUpForm() {
 
         if (Object.keys(newErrors).length === 0) {
             alert('アカウント作成が完了しました！（仮）');
+            navigate('/login');
         }
     };
 
@@ -60,6 +62,17 @@ function SignUpForm() {
         cursor: 'pointer',
     };
 
+    const linkButtonStyle = {
+        padding: '10px',
+        fontSize: '16px',
+        backgroundColor: 'transparent',
+        color: '#007bff',
+        border: 'none',
+        textDecoration: 'underLine',
+        cursor: 'pointer',
+        textAlign: 'center'
+    };
+
     return (
         <form style={formStyle} onSubmit={handleSubmit}>
             <div>
@@ -68,7 +81,7 @@ function SignUpForm() {
                     name="username"
                     placeholder="ユーザー名"
                     value={formData.username}
-                    onChange={handleInputChange} 
+                    onChange={handleInputChange}
                     style={inputStyle}
                 />
                 {errors.username && <p style={errorStyle}>{errors.username}</p>}
@@ -100,6 +113,14 @@ function SignUpForm() {
 
             <button type="submit" style={buttonStyle}>
                 アカウント作成
+            </button>
+
+            <button
+                type="button"
+                onClick={()=>navigate('/login')}
+                style={linkButtonStyle}
+            >
+                ログイン画面に戻る
             </button>
         </form>
     );
