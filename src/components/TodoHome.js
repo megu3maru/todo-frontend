@@ -1,9 +1,13 @@
 import React, {useState} from 'react';
+import TaskFilter from './TaskFilter';
+import TaskList from './TaskList';
+
 
 function TodoHome({ onLogout, username }) {
     const [tasks, setTasks] = useState([]);
     const [title, setTitle] = useState('');
     const [detailes, setDetailes] = useState('');
+    const [filter, setFilter] = useState('all');
     const [error, setError] = useState('');
     const [notification, setNotification] = useState('');
 
@@ -15,8 +19,8 @@ function TodoHome({ onLogout, username }) {
             return;
         }
 
-        if(detailes.trim().length === 0){
-            setError('詳細を入力してください。');
+        if(!title || !detailes){
+            setError('タイトルと詳細を入力してください。');
             return;
         }
 
@@ -30,7 +34,8 @@ function TodoHome({ onLogout, username }) {
             title: title.trim(),
             detailes: detailes.trim(),
             createdAt: currentDateTime,
-            updatedAt: currentDateTime
+            updatedAt: currentDateTime,
+            completed: false
         };
 
         setTasks([...tasks, newTask]);
@@ -43,11 +48,35 @@ function TodoHome({ onLogout, username }) {
     };
 
 
+    const handleToggleComplete = (taskId) => {
+        setTasks(
+            tasks.map((task) =>
+                task.id === taskId
+                    ? {...task, completed: !task.completed, updatedAt: new Date().toLocaleString()}
+                    : task
+            )
+        );
+    };
+
+
+    const filteredTasks = tasks.filter((task) =>{
+        if (filter === 'completed') return task.completed;
+        if (filter === 'incomplete') return !task.completed;
+        return true;
+    });
+
+
     const handleLogout = () => {
         setTasks([]);
         onLogout();
     };
 
+
+    const containerStyle = {
+        width: '600px',
+        margin: '0 auto',
+        padding: '20px'
+    }
 
     const headerStyle = {
         display: 'flex',
@@ -56,67 +85,73 @@ function TodoHome({ onLogout, username }) {
         marginBottom: '20px',
     };
 
-    const buttonStyle = {
+    const formStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '15px',
+        marginTop: '20px'
+    }
+
+    const inputStyle = {
         padding: '10px',
+        fontSize: '16px',
+        width: '100%',
+        boxSizing: 'border-box'
+    }
+
+    const errorStyle = {
+        color: 'red',
+        fontSize: '14px'
+    }
+
+    const loggoutButtonStyle = {
+        padding: '10px',
+        fontSize: '16px',
         backgroundColor: '#dc3545',
         color: '#fff',
         border: 'none',
         cursor: 'pointer',
-        borderRadius: '5px'
     };
 
 
 
     return (
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', boxSizing: 'border-box'}}>
+        <div style={containerStyle}>
             <header style={headerStyle}>
                 <div>
                     {username}でログイン中
                 </div>
-                <button style={buttonStyle} onClick={handleLogout}>
+                <button style={loggoutButtonStyle} onClick={onLogout}>
                     ログアウト
                 </button>
             </header>
 
-            <form onSubmit={handleAddTask} style={{marginBottom: '20px'}}>
+            <form style={formStyle} onSubmit={handleAddTask} >
                 <input
                     type='text'
                     placeholder="タスクタイトル（25文字以内）"
                     value={title}
                     onChange={(e)=> setTitle(e.target.value)}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        border: '1px solid #ccc',
-                        borderRadius: '5px'
-                    }}
+                    style={inputStyle}
                 />
                 <textarea
                     placeholder= "タスク詳細"
                     value={detailes}
                     onChange={(e)=>setDetailes(e.target.value)}
-                    rows="4"
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        border: '1px solid #ccc',
-                        borderRadius: '5px'
-                    }}
+                    style={{...inputStyle, height:'120px'}}
                 />
 
-                {error && <p style={{color:'red', marginTop:'10px'}}>{error}</p>}
+                {error && <p style={errorStyle}>{error}</p>}
 
                 <button
                     type= 'submit'
                     style={{
-                        padding: '10px 20px',
-                        backbroundColor: '#007bff',
+                        padding: '10px',
+                        fontSize: '16px',
+                        backbroundColor: '#28a745',
                         color: '#fff',
                         border: 'none',
                         cursor: 'pointer',
-                        borderRadius: '5px',
-                        marginTop: '10px'
                     }}
                 >
                     追加
@@ -125,25 +160,9 @@ function TodoHome({ onLogout, username }) {
 
             {notification && <p style={{color:'green', marginBottom:'20px'}}>{notification}</p>}
 
-            <ul style={{listStyle:'none', padding:0}}>
-                {tasks.map((task)=>(
-                    <li
-                        key={task.id}
-                        style={{
-                            borderBottom: '1px solid #ddd',
-                            padding: '10px',
-                            marginBottom: '10px',
-                            borderRadius: '5px',
-                            bockgroundColor: '#f8f9fa'
-                        }}
-                    >
-                        <h3 style={{margin:'0 0 5px 0'}}>{task.title}</h3>
-                        <p style={{margin: '0 0 5px 0'}}>{task.detailes}</p>
-                        <small style={{display:'block', color:'#888'}}>作成日時：{task.createdAt}</small>
-                        <small style={{display:'block', color:'#888'}}>更新日時：{task.updatedAt}</small>
-                    </li>
-                ))}
-            </ul>
+            <TaskFilter filter={filter} setFilter={setFilter} />
+
+            <TaskList tasks={filteredTasks} onToggleComplete={handleToggleComplete} />
         </div>
     );
 }
