@@ -6,7 +6,7 @@ import TaskList from './TaskList';
 function TodoHome({ onLogout, username }) {
     const [tasks, setTasks] = useState([]);
     const [title, setTitle] = useState('');
-    const [detailes, setDetailes] = useState('');
+    const [details, setDetails] = useState('');
     const [filter, setFilter] = useState('all');
     const [error, setError] = useState('');
     const [notification, setNotification] = useState('');
@@ -14,12 +14,12 @@ function TodoHome({ onLogout, username }) {
     const handleAddTask = (e) => {
         e.preventDefault();
 
-        if(title.trim().length === 0 || title.trim().lemgth > 25){
+        if(title.trim().length === 0 || title.trim().length > 25){
             setError('タイトルは1文字以上、25文字以内で入力してください。');
             return;
         }
 
-        if(!title || !detailes){
+        if(!title || !details){
             setError('タイトルと詳細を入力してください。');
             return;
         }
@@ -32,7 +32,7 @@ function TodoHome({ onLogout, username }) {
         const newTask = {
             id: Date.now(),
             title: title.trim(),
-            detailes: detailes.trim(),
+            details: details.trim(),
             createdAt: currentDateTime,
             updatedAt: currentDateTime,
             completed: false
@@ -41,10 +41,31 @@ function TodoHome({ onLogout, username }) {
         setTasks([...tasks, newTask]);
 
         setTitle('');
-        setDetailes('');
+        setDetails('');
 
         setNotification('タスクが追加されました！');
         setTimeout(()=>setNotification(''), 3000)
+    };
+
+
+    const handleDeleteTask = (taskId) => {
+        setTasks(tasks.filter((task) =>  task.id !== taskId));
+    };
+
+
+    const handleUpdateTask = (taskId, updatedTitle, updatedDetails) => {
+        setTasks(
+            tasks.map((task) =>
+                task.id === taskId
+                    ?{
+                        ...task,
+                        title: updatedTitle,
+                        details: updatedDetails,
+                        updatedAt: new Date().toLocaleString()
+                    }
+                    : task
+            )
+        );
     };
 
 
@@ -136,8 +157,8 @@ function TodoHome({ onLogout, username }) {
                 />
                 <textarea
                     placeholder= "タスク詳細"
-                    value={detailes}
-                    onChange={(e)=>setDetailes(e.target.value)}
+                    value={details}
+                    onChange={(e)=>setDetails(e.target.value)}
                     style={{...inputStyle, height:'120px'}}
                 />
 
@@ -162,7 +183,7 @@ function TodoHome({ onLogout, username }) {
 
             <TaskFilter filter={filter} setFilter={setFilter} />
 
-            <TaskList tasks={filteredTasks} onToggleComplete={handleToggleComplete} />
+            <TaskList tasks={filteredTasks} onDelete={handleDeleteTask} onUpdate={handleUpdateTask} onToggleComplete={handleToggleComplete} />
         </div>
     );
 }
