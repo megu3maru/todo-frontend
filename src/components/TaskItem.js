@@ -11,6 +11,19 @@ function TaskItem({task, onDelete, onUpdate, onToggleComplete}) {
         setIsEditing(false);
     };
 
+    const formatToJST = (isoString) => {
+        const date = new Date(isoString + 'Z');
+        return date.toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+        });
+    };
+
     const itemStyle = {
         padding: '15px',
         borderBottom: '1px solid #ddd',
@@ -77,9 +90,9 @@ function TaskItem({task, onDelete, onUpdate, onToggleComplete}) {
                 <>
                     <h3 style={textStyle} onClick={()=> onToggleComplete(task.id)}>{task.title}</h3>
                     <p style={textStyle} onClick={()=> onToggleComplete(task.id)}>{task.details}</p>
-                    <small>作成日時：{task.createdAt}</small>
+                    <small>作成日時：{formatToJST(task.createdAt)}</small>
                     <br />
-                    <small>更新日時：{task.updatedAt}</small>
+                    <small>更新日時：{formatToJST(task.updatedAt)}</small>
                     <br />
                     <button onClick={()=> setIsEditing(true)} style={editButtonStyle}>編集</button>
                     <button onClick={()=> onDelete(task.id)} style={deleteButtonStyle}>削除</button>

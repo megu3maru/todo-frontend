@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/client';
 
 function LoginForm({ onLogin }) {
     const [username, setUsername] = useState(''); // ユーザー名入力
@@ -7,21 +8,16 @@ function LoginForm({ onLogin }) {
     const [error, setError] = useState(''); // エラーメッセージ
     const navigate = useNavigate(); // ページ遷移用
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
-
-        // 仮の認証データ
-        const mockUser = {
-            username: 'testuser',
-            password: 'password123',
-        };
-
-        // 入力値が正しい場合
-        if (username === mockUser.username && password === mockUser.password) {
-            onLogin(username); // ログイン処理を実行
-            navigate('/home'); // ホーム画面へ遷移
-        } else {
-            setError('ユーザー名またはパスワードが正しくありません。');
+        try {
+            const response = await apiClient.post('/auth/login', {username, password});
+            const {token} = response.data;
+            localStorage.setItem('token', token);
+            onLogin(username);
+            navigate('/home')
+        } catch {
+            setError('ログインに失敗しました。ユーザー名またはパスワードを確認してください。');
         }
     };
 
