@@ -65,7 +65,7 @@ function TodoHome({ username }) {
         } catch (err) {
             setError(err.message);
         }
-    };{}
+    };
 
     const handleDeleteTask = async (taskId) => {
         try {
